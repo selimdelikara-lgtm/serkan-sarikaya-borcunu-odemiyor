@@ -182,8 +182,8 @@ h1 .ln:nth-child(2){color:var(--r)}
 /* ---- yan yana şerit ---- */
 .strip{position:absolute;inset:0;z-index:1;display:flex;align-items:center;gap:10px;
   padding:16px 10px 58px 54px;scroll-padding-left:54px;
-  overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;
-  overscroll-behavior-x:contain;scroll-behavior:smooth;
+  overflow-x:auto;overflow-y:hidden;scroll-snap-type:none;
+  overscroll-behavior-x:contain;
   scrollbar-width:none;-ms-overflow-style:none;
   transition:opacity .55s ease}
 .strip::-webkit-scrollbar{width:0;height:0;display:none}
@@ -558,6 +558,7 @@ h1 .ln:nth-child(2){color:var(--r)}
   // Seçili kare sol kenara hizalanır: her ekranda 4 farklı alıntı görünür
   var padL = cells.length ? cells[0].offsetLeft : 0;
   var lastGo = 0;
+  var lastK = -1;                 // şeritte seçili kare (tekrar tetiklemeyi önler)
 
   function scrollToCell(k, anim){
     var cell = cells[k];
@@ -575,6 +576,7 @@ h1 .ln:nth-child(2){color:var(--r)}
     strip.classList.toggle("hide", !inStrip);
     portrait.classList.toggle("on", !inStrip);
     cells.forEach(function(c, k){ c.classList.toggle("on", k === ci); });
+    lastK = inStrip ? ci : -1;
     thumbs.forEach(function(t, k){ t.classList.toggle("on", k === i); });
     if (inStrip){ if (!(opt && opt.sessiz)) scrollToCell(ci, true); }
     else { strip.scrollLeft = 0; }
@@ -632,13 +634,24 @@ h1 .ln:nth-child(2){color:var(--r)}
     });
   });
 
-  // Şerit üzerinde fare tekeri / touchpad ile kaydırma
+  // Şerit üzerinde fare tekeri / touchpad ile kaydırma.
+  // Hareket tek karede toplanıp uygulanır (takılma olmaz); durunca
+  // en yakın kare yumuşak biçimde tam hizaya oturur.
+  var rafId = null, bekleyen = 0;
   strip.addEventListener("wheel", function(e){
     var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
     if (!d) return;
+    if (e.deltaMode === 1) d *= 16;            // satır modu (fare) → piksel
     markUser();
-    strip.scrollLeft += d;
+    stop();
     if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) e.preventDefault();
+    bekleyen += d;
+    if (rafId) return;
+    rafId = requestAnimationFrame(function(){
+      rafId = null;
+      var adim = bekleyen; bekleyen = 0;
+      strip.scrollLeft += adim;
+    });
   }, { passive: false });
 
   // Kullanıcı kaydırdığında seçim sol kenardaki kareye geçer
@@ -651,6 +664,7 @@ h1 .ln:nth-child(2){color:var(--r)}
   }
   strip.addEventListener("scroll", function(){
     if (!userScroll) return;
+    markUser();                     // kaydırma sürüyor (momentum dahil) → bayrağı uzat
     clearTimeout(sT);
     sT = setTimeout(function(){
       var pad = cells.length ? cells[0].offsetLeft : 0, k = 0;
@@ -658,10 +672,17 @@ h1 .ln:nth-child(2){color:var(--r)}
         if (cells[j].offsetLeft - strip.scrollLeft >= pad - 3){ k = j; break; }
         k = j;
       }
-      if (tab !== 0) setTab(0);
-      go(k + (PHOTO_FIRST ? 1 : 0), { sessiz: true });
+      if (k !== lastK){                 // aynı karede tekrar tetikleme → zıplama yok
+        lastK = k;
+        if (tab !== 0) setTab(0);
+        go(k + (PHOTO_FIRST ? 1 : 0), { sessiz: true });
+      }
+      // kare tam hizaya otursun: yumuşak kısa kayma
+      var son = Math.max(0, strip.scrollWidth - strip.clientWidth);
+      var hedef = Math.max(0, Math.min(cells[k].offsetLeft - pad, son));
+      if (Math.abs(strip.scrollLeft - hedef) > 1) strip.scrollTo({ left: hedef, behavior: "smooth" });
       start();
-    }, 140);
+    }, 130);
   });
   strip.addEventListener("touchstart", markUser, { passive: true });
   strip.addEventListener("touchmove", markUser, { passive: true });
