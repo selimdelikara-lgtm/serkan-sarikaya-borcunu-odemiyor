@@ -180,11 +180,16 @@ h1 .ln:nth-child(2){color:var(--r)}
 
 /* ---- yan yana şerit ---- */
 .strip{position:absolute;inset:0;z-index:1;display:flex;align-items:center;gap:10px;
-  padding:16px 14px 58px 54px;
-  transition:transform .9s cubic-bezier(.16,1,.3,1),opacity .55s ease}
+  padding:16px 10px 58px 54px;scroll-padding-left:54px;
+  overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;
+  overscroll-behavior-x:contain;scroll-behavior:smooth;
+  scrollbar-width:none;-ms-overflow-style:none;
+  transition:opacity .55s ease}
+.strip::-webkit-scrollbar{width:0;height:0;display:none}
 .strip.hide{opacity:0;pointer-events:none}
 
-.cell{margin:0;flex:0 0 auto;width:var(--cw,224px);height:100%;display:flex;
+.cell{margin:0;flex:0 0 auto;width:var(--cw,222px);height:100%;display:flex;
+  scroll-snap-align:start;cursor:pointer;
   flex-direction:column;align-items:center;justify-content:center;gap:13px;
   opacity:0;transform:translateY(26px)}
 .cell.in{animation:cellIn .75s cubic-bezier(.16,1,.3,1) var(--d,0ms) forwards}
@@ -194,16 +199,17 @@ h1 .ln:nth-child(2){color:var(--r)}
   display:flex;align-items:center;justify-content:center;
   border:3px solid var(--k);background:#141414;
   box-shadow:7px 7px 0 rgba(0,0,0,.6);
-  opacity:.5;filter:grayscale(.85) brightness(.9);
+  opacity:.93;filter:saturate(.92);
   transition:transform .75s cubic-bezier(.16,1,.3,1),opacity .55s,filter .55s,box-shadow .55s}
-.cell.on .frame{opacity:1;filter:none;transform:scale(1.035) translateY(-4px);
+.cell:hover .frame{opacity:1;filter:none;transform:translateY(-3px)}
+.cell.on .frame{opacity:1;filter:none;transform:translateY(-5px);
   box-shadow:6px 6px 0 var(--y),0 0 0 3px var(--r)}
 .cell .frame img{display:block;max-height:100%;max-width:100%;width:auto;height:auto;
   object-fit:contain;background:#141414}
 .cell .frame .tag{position:absolute;left:0;top:0;z-index:2;background:var(--k);
   color:var(--y);font:800 11px/1 var(--mono);letter-spacing:.14em;padding:5px 8px}
 .cell figcaption{font:700 11.5px/1 var(--mono);letter-spacing:.16em;
-  text-transform:uppercase;color:var(--y);opacity:.4;transition:opacity .45s}
+  text-transform:uppercase;color:var(--y);opacity:.62;transition:opacity .45s}
 .cell.on figcaption{opacity:1}
 
 /* boş çerçeve (görsel henüz yok) */
@@ -562,18 +568,20 @@ h1 .ln:nth-child(2){color:var(--r)}
 
   function pad(n){ return (n < 9 ? "0" : "") + (n + 1); }
 
-  function center(k){
-    var parent = strip.clientWidth, cell = cells[k];
-    if (!cell){ strip.style.transform = "translateX(0)"; return; }
-    var last = cells[cells.length - 1];
-    var needed = last.offsetLeft + last.offsetWidth + 14;
-    if (needed <= parent){ strip.style.transform = "translateX(0)"; return; }
-    var target = parent / 2 - (cell.offsetLeft + cell.offsetWidth / 2);
-    var min = parent - needed;
-    strip.style.transform = "translateX(" + Math.max(min, Math.min(0, Math.round(target))) + "px)";
+  // Seçili kare sol kenara hizalanır: her ekranda 4 farklı alıntı görünür
+  var padL = cells.length ? cells[0].offsetLeft : 0;
+  var lastGo = 0;
+
+  function scrollToCell(k, anim){
+    var cell = cells[k];
+    if (!cell) return;
+    var x = Math.max(0, cell.offsetLeft - padL);
+    if (Math.abs(strip.scrollLeft - x) < 2) return;
+    if (anim === false) strip.scrollLeft = x;
+    else strip.scrollTo({ left: x, behavior: "smooth" });
   }
 
-  function go(n){
+  function go(n, opt){
     i = (n + TOTAL) % TOTAL;
     var inStrip = PHOTO_FIRST ? (i > 0) : (i < cells.length);
     var ci      = PHOTO_FIRST ? i - 1 : i;
@@ -581,7 +589,9 @@ h1 .ln:nth-child(2){color:var(--r)}
     portrait.classList.toggle("on", !inStrip);
     cells.forEach(function(c, k){ c.classList.toggle("on", k === ci); });
     thumbs.forEach(function(t, k){ t.classList.toggle("on", k === i); });
-    if (inStrip) center(ci); else strip.style.transform = "translateX(0)";
+    if (inStrip){ if (!(opt && opt.sessiz)) scrollToCell(ci, true); }
+    else { strip.scrollLeft = 0; }
+    lastGo = Date.now();
     slider.classList.toggle("wa", inStrip);
     if (sideLbl) sideLbl.textContent = inStrip ? "Yazışma alıntısı" : "Karşı taraf";
     if (cur)  cur.textContent  = pad(i);
@@ -625,6 +635,49 @@ h1 .ln:nth-child(2){color:var(--r)}
       go(parseInt(t.dataset.i, 10)); start();
     });
   });
+
+  // Açık kareye tıkla → o alıntı seçilir (kırmızı çerçeve + alt yazı)
+  cells.forEach(function(c, k){
+    c.addEventListener("click", function(){
+      if (tab !== 0) setTab(0);
+      go(k + (PHOTO_FIRST ? 1 : 0));
+      start();
+    });
+  });
+
+  // Şerit üzerinde fare tekeri / touchpad ile kaydırma
+  strip.addEventListener("wheel", function(e){
+    var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (!d) return;
+    markUser();
+    strip.scrollLeft += d;
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) e.preventDefault();
+  }, { passive: false });
+
+  // Kullanıcı kaydırdığında seçim sol kenardaki kareye geçer
+  // Kaydırma kullanıcıdan mı geldi? (otomatik akış / tıklama seçimi bozmasın)
+  var userScroll = false, uT = null, sT = null;
+  function markUser(){
+    userScroll = true;
+    clearTimeout(uT);
+    uT = setTimeout(function(){ userScroll = false; }, 400);
+  }
+  strip.addEventListener("scroll", function(){
+    if (!userScroll) return;
+    clearTimeout(sT);
+    sT = setTimeout(function(){
+      var pad = cells.length ? cells[0].offsetLeft : 0, k = 0;
+      for (var j = 0; j < cells.length; j++){
+        if (cells[j].offsetLeft - strip.scrollLeft >= pad - 3){ k = j; break; }
+        k = j;
+      }
+      if (tab !== 0) setTab(0);
+      go(k + (PHOTO_FIRST ? 1 : 0), { sessiz: true });
+      start();
+    }, 140);
+  });
+  strip.addEventListener("touchstart", markUser, { passive: true });
+  strip.addEventListener("touchmove", markUser, { passive: true });
   slider.addEventListener("mouseenter", stop);
   slider.addEventListener("mouseleave", start);
   document.addEventListener("keydown", function(e){
