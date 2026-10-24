@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Serkan Sarıkaya paramı vermiyor!</title>
-<meta name="description" content="Teslim edilen işlerin bedeli ödenmedi. 10 iş, 292.500 TL kalan alacak, @@ENUZUN@ geçen süre.">
+<meta name="description" content="Teslim edilen işlerin bedeli ödenmedi. 10 iş, 292.500 TL kalan alacak; ilk teslimden bu yana 377 gün.">
 <meta property="og:title" content="Serkan Sarıkaya paramı vermiyor!">
 <meta property="og:description" content="Teslim edilen işlerin bedeli ödenmedi. 10 iş, 292.500 TL kalan alacak.">
 <style>
@@ -88,6 +88,13 @@ h1 .ln:nth-child(2){color:var(--r)}
 .stat:nth-child(2) u{animation-delay:1.1s}
 .stat:nth-child(3) u{animation-delay:1.2s}
 @keyframes fill-u{to{background-size:100% 40%}}
+
+.talep{margin-top:2px;display:flex;gap:12px;align-items:flex-start;
+  border-left:7px solid var(--r);background:rgba(10,10,10,.07);padding:10px 12px;
+  opacity:0;animation:up .6s cubic-bezier(.16,1,.3,1) .9s forwards}
+.talep b{font:800 13px/1.35 var(--mono);letter-spacing:.14em;
+  text-transform:uppercase;white-space:nowrap}
+.talep span{font-size:14.5px;line-height:1.4;text-wrap:pretty}
 
 .stamp{margin-top:auto;align-self:flex-start;font-family:var(--disp);
   font-size:64px;line-height:1;letter-spacing:-1px;text-transform:uppercase;
@@ -301,6 +308,12 @@ h1 .ln:nth-child(2){color:var(--r)}
         <div class="stat"><b>Toplam kalan alacak</b><u>292.500 TL</u></div>
         <div class="stat"><b>İlk teslimden bu yana</b><u>377 gün</u></div>
         <div class="stat"><b>Ödenmeyen iş</b><u>10</u></div>
+      </div>
+
+      <div class="talep">
+        <b>Talep</b>
+        <span>Teslim edilen işlerin bedelinin ödenmesi. Ödeme yapılana kadar
+          bu kayıt güncel kalacaktır.</span>
       </div>
 
       <div class="stamp">Ödenmedi</div>
