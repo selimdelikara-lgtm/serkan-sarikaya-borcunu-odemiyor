@@ -97,7 +97,7 @@ h1 .ln:nth-child(3){color:var(--r)}
 @keyframes stampIn{to{opacity:1;transform:rotate(-7deg) scale(1)}}
 @keyframes pulse{50%{transform:rotate(-7deg) scale(1.045)}}
 
-/* sağ kolon — slider */
+/* sağ kolon — kanıt şeridi */
 .right{display:flex;flex-direction:column;min-width:0;min-height:0;
   opacity:0;animation:up .7s cubic-bezier(.16,1,.3,1) .35s forwards}
 .paneHead{display:flex;align-items:flex-end;justify-content:space-between;
@@ -114,7 +114,7 @@ h1 .ln:nth-child(3){color:var(--r)}
 /* kanıt çerçevesi: filigran + vinyet + köşe braketleri */
 .slider:before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
   background:radial-gradient(120% 95% at 50% 46%,rgba(255,212,0,.14),rgba(0,0,0,.6) 72%)}
-.slider:after{content:"KANIT";position:absolute;left:50%;top:50%;z-index:0;
+.slider:after{content:"KANIT";position:absolute;left:50%;top:44%;z-index:0;
   transform:translate(-50%,-50%);pointer-events:none;text-transform:uppercase;
   font-family:var(--disp);font-size:330px;line-height:1;letter-spacing:6px;
   color:rgba(255,212,0,.075)}
@@ -122,62 +122,87 @@ h1 .ln:nth-child(3){color:var(--r)}
   opacity:0;animation:up .55s cubic-bezier(.16,1,.3,1) .7s forwards}
 .cor.tl{left:16px;top:16px;border-right:0;border-bottom:0}
 .cor.tr{right:16px;top:16px;border-left:0;border-bottom:0}
-.cor.bl{left:16px;bottom:16px;border-right:0;border-top:0}
-.cor.br{right:16px;bottom:16px;border-left:0;border-top:0}
-.side{position:absolute;left:24px;top:50%;z-index:3;
+.cor.bl{left:16px;bottom:42px;border-right:0;border-top:0}
+.cor.br{right:16px;bottom:42px;border-left:0;border-top:0}
+.side{position:absolute;left:24px;top:46%;z-index:4;
   transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl;
   background:var(--y);color:var(--k);font:800 12.5px/1 var(--mono);
   letter-spacing:.2em;padding:10px 6px;text-transform:uppercase}
 .side i{font-style:normal;color:var(--r)}
 
-.track{position:relative;z-index:1;display:flex;height:100%;
-  transition:transform .85s cubic-bezier(.16,1,.3,1)}
-.slide{flex:0 0 100%;margin:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:10px;padding:16px 16px 12px 54px;
-  opacity:.12;transition:opacity .7s ease}
-.slide.on{opacity:1}
-.slide figcaption{font:700 13.5px/1 var(--mono);letter-spacing:.16em;
-  text-transform:uppercase;color:var(--y);opacity:0;transition:opacity .5s .25s}
-.slide.on figcaption{opacity:.92}
+/* ---- yan yana şerit ---- */
+.strip{position:absolute;inset:0;z-index:1;display:flex;align-items:center;gap:10px;
+  padding:16px 14px 46px 54px;
+  transition:transform .9s cubic-bezier(.16,1,.3,1),opacity .55s ease}
+.strip.hide{opacity:0;pointer-events:none}
 
-.shot{position:relative;display:flex;align-items:center;justify-content:center;
-  flex:1 1 auto;min-height:0;max-width:100%}
-.shot img{display:block;height:100%;width:auto;max-width:100%;max-height:100%;
-  object-fit:contain;background:#fff;border:3px solid var(--k)}
-.shot.on img{animation:kb 5.5s ease-out forwards}
-@keyframes kb{from{transform:scale(1.001)}to{transform:scale(1.045)}}
-.shot .tag{position:absolute;left:0;top:0;z-index:2;background:var(--k);
-  color:var(--y);font:800 12px/1 var(--mono);letter-spacing:.14em;padding:6px 9px}
+.cell{margin:0;flex:1 1 0;min-width:150px;height:100%;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  opacity:0;transform:translateY(26px)}
+.cell.in{animation:cellIn .75s cubic-bezier(.16,1,.3,1) var(--d,0ms) forwards}
+@keyframes cellIn{to{opacity:1;transform:none}}
+
+.cell .frame{position:relative;flex:1 1 auto;min-height:0;width:100%;
+  display:flex;align-items:center;justify-content:center;
+  border:3px solid var(--k);background:#f6f4ee;
+  box-shadow:7px 7px 0 rgba(0,0,0,.6);
+  opacity:.5;filter:grayscale(.85) brightness(.9);
+  transition:transform .75s cubic-bezier(.16,1,.3,1),opacity .55s,filter .55s,box-shadow .55s}
+.cell.on .frame{opacity:1;filter:none;transform:scale(1.035) translateY(-4px);
+  box-shadow:9px 9px 0 var(--y),0 0 0 3px var(--r)}
+.cell .frame img{display:block;height:100%;width:100%;object-fit:contain;
+  background:#fff}
+.cell .frame .tag{position:absolute;left:0;top:0;z-index:2;background:var(--k);
+  color:var(--y);font:800 11px/1 var(--mono);letter-spacing:.14em;padding:5px 8px}
+.cell figcaption{font:700 11.5px/1 var(--mono);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--y);opacity:.4;transition:opacity .45s}
+.cell.on figcaption{opacity:1}
 
 /* yer tutucu: sahte WhatsApp ekranı */
-.slide .ph{flex:0 0 auto;width:296px;max-width:88%;background:#e9e5dc;
-  border:3px solid var(--k);position:relative;padding-top:44px;
-  height:100%;max-height:512px;display:flex;flex-direction:column}
-.phTop{position:absolute;left:0;right:0;top:0;height:44px;background:#075e54;
-  color:#fff;display:flex;align-items:center;gap:9px;padding:0 12px}
-.phTop .av{width:24px;height:24px;border-radius:50%;background:#128c7e;flex:0 0 auto}
-.phTop b{font:600 14px/1 var(--sans)}
-.phTop i{margin-left:auto;font:400 11px/1 var(--sans);opacity:.7;font-style:normal}
-.phBody{flex:1;padding:12px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
-.bb{max-width:82%;font-size:12.5px;line-height:1.35;padding:7px 10px;
-  border-radius:9px;box-shadow:0 1px 1px rgba(0,0,0,.14);position:relative}
+.cell .ph{width:100%;height:100%;background:#e9e5dc;position:relative;
+  padding-top:36px;display:flex;flex-direction:column;overflow:hidden}
+.phTop{position:absolute;left:0;right:0;top:0;height:36px;background:#075e54;
+  color:#fff;display:flex;align-items:center;gap:7px;padding:0 9px}
+.phTop .av{width:20px;height:20px;border-radius:50%;background:#128c7e;flex:0 0 auto}
+.phTop b{font:600 11.5px/1 var(--sans);white-space:nowrap;overflow:hidden}
+.phTop i{margin-left:auto;font:400 9px/1 var(--sans);opacity:.7;font-style:normal}
+.phBody{flex:1;padding:9px;display:flex;flex-direction:column;gap:7px;overflow:hidden}
+.bb{max-width:86%;font-size:10.5px;line-height:1.32;padding:6px 8px;
+  border-radius:8px;box-shadow:0 1px 1px rgba(0,0,0,.14);position:relative}
 .bb.in{background:#fff;align-self:flex-start}
 .bb.out{background:#dcf8c6;align-self:flex-end}
-.bb .tick{font-size:9px;color:#4a90a4;margin-left:5px}
+.bb .tick{font-size:8px;color:#4a90a4;margin-left:4px}
 .phTag{position:absolute;left:0;right:0;bottom:0;background:var(--r);color:#fff;
-  font:800 10.5px/1.25 var(--mono);letter-spacing:.1em;text-align:center;padding:7px 8px}
-.ph-face{flex:0 0 auto;width:296px;max-width:88%;height:100%;max-height:512px;
-  background:#e9e5dc;display:flex;align-items:center;justify-content:center;
-  border:3px solid var(--k);position:relative}
-.ph-face .face{width:190px;height:190px;border-radius:50%;background:#ded8cd;
-  display:flex;align-items:center;justify-content:center;
+  font:800 8.5px/1.25 var(--mono);letter-spacing:.08em;text-align:center;padding:5px 4px}
+
+/* ---- karşı taraf fotoğrafı ---- */
+.portrait{position:absolute;inset:0;z-index:1;margin:0;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  padding:16px 16px 46px 56px;opacity:0;pointer-events:none;
+  transition:opacity .6s ease}
+.portrait.on{opacity:1}
+.portrait img{max-height:100%;max-width:100%;object-fit:contain;
+  border:3px solid var(--k);background:#fff;box-shadow:8px 8px 0 rgba(0,0,0,.6)}
+.portrait .tag{position:absolute;left:56px;top:16px;background:var(--k);
+  color:var(--y);font:800 11px/1 var(--mono);letter-spacing:.14em;padding:5px 8px}
+.portrait .face{width:270px;height:270px;border-radius:50%;background:#ded8cd;
+  border:3px solid var(--k);display:flex;align-items:center;justify-content:center;
   animation:ring 2.6s ease-out infinite}
-.ph-face .face svg{width:78%;height:78%}
+.portrait .face svg{width:78%;height:78%}
 @keyframes ring{0%{box-shadow:0 0 0 0 rgba(226,35,26,.55)}
-  70%{box-shadow:0 0 0 24px rgba(226,35,26,0)}100%{box-shadow:0 0 0 0 rgba(226,35,26,0)}}
+  70%{box-shadow:0 0 0 24px rgba(226,35,26,0)}100%{box-shadow:0 0 0 24px rgba(226,35,26,0)}}
+.portrait .phTag{position:static;font:800 10px/1.3 var(--mono);padding:6px 10px;
+  letter-spacing:.1em}
+
+/* altyazı bandı */
+.capBar{position:absolute;left:0;right:0;bottom:0;z-index:5;height:32px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  background:rgba(10,10,10,.86);color:var(--y);
+  font:700 12.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase}
+.capBar em{font-style:normal;color:var(--r)}
 
 /* canlı yayın şeridi */
-.live{position:absolute;right:0;top:0;z-index:4;display:flex;align-items:center;gap:7px;
+.live{position:absolute;right:0;top:0;z-index:6;display:flex;align-items:center;gap:7px;
   background:var(--r);color:#fff;font:800 11px/1 var(--mono);letter-spacing:.16em;
   padding:7px 11px}
 .live i{width:8px;height:8px;background:#fff;border-radius:50%;
@@ -218,7 +243,7 @@ h1 .ln:nth-child(3){color:var(--r)}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001s !important;animation-iteration-count:1 !important;
     transition-duration:.001s !important}
-  .track{transition:none}
+  .strip{transition:none}
 }
 </style>
 </head>
@@ -265,72 +290,75 @@ h1 .ln:nth-child(3){color:var(--r)}
         <span class="cor tl"></span><span class="cor tr"></span>
         <span class="cor bl"></span><span class="cor br"></span>
         <span class="side">EKRAN GÖRÜNTÜSÜ <i>01</i></span>
-        <div class="track" id="track">
-  <figure class="slide on" data-kind="wa">
-    <div class="shot ph-wrap"><span class="tag">K-01</span>
-      <div class="ph">
-        <div class="phTop"><span class="av"></span><b>[BORÇLU ADI]</b><i>çevrimiçi</i></div>
-        <div class="phBody">
+
+        <div class="strip" id="strip">
+    <figure class="cell" data-i="0" data-cap="WhatsApp yazışması · 01" style="--d:140ms">
+      <div class="frame ph-frame">
+        <div class="ph">
+          <div class="phTop"><span class="av"></span><b>[BORÇLU ADI]</b><i>çevrimiçi</i></div>
+          <div class="phBody">
             <div class="bb in">Kurduğum faturayı ödediniz mi?</div>
             <div class="bb out">Yarın sabah ilk işim.<span class="tick">✓✓</span></div>
             <div class="bb in">Bugün bankadayım, akşam geçer.</div>
             <div class="bb out">Geçen hafta da aynısını demiştiniz.<span class="tick">✓✓</span></div>
             <div class="bb in">Sistemde gecikme var, kontrol ediyorum.</div>
-        </div>
-        <span class="phTag">GERÇEK EKRAN GÖRÜNTÜSÜ BURAYA GELECEK</span>
-      </div></div>
-    <figcaption>WhatsApp yazışması · 01</figcaption>
-  </figure>
-  <figure class="slide" data-kind="wa">
-    <div class="shot ph-wrap"><span class="tag">K-02</span>
-      <div class="ph">
-        <div class="phTop"><span class="av"></span><b>[BORÇLU ADI]</b><i>çevrimiçi</i></div>
-        <div class="phBody">
+          </div>
+          <span class="phTag">GERÇEK EKRAN GÖRÜNTÜSÜ</span>
+        </div><span class="tag">K-01</span></div>
+      <figcaption>K-01</figcaption>
+    </figure>
+    <figure class="cell" data-i="1" data-cap="WhatsApp yazışması · 02" style="--d:230ms">
+      <div class="frame ph-frame">
+        <div class="ph">
+          <div class="phTop"><span class="av"></span><b>[BORÇLU ADI]</b><i>çevrimiçi</i></div>
+          <div class="phBody">
             <div class="bb in">İşi teslim ettim, ödeme ne zaman?</div>
             <div class="bb out">Bu hafta içinde hallediyorum.<span class="tick">✓✓</span></div>
             <div class="bb in">Hafta bitti, hesaba geçen yok.</div>
             <div class="bb out">Yarın mutlaka gönderiyorum.<span class="tick">✓✓</span></div>
             <div class="bb in">Muhasebe yoğun, sıraya aldım.</div>
-        </div>
-        <span class="phTag">GERÇEK EKRAN GÖRÜNTÜSÜ BURAYA GELECEK</span>
-      </div></div>
-    <figcaption>WhatsApp yazışması · 02</figcaption>
-  </figure>
-  <figure class="slide" data-kind="wa">
-    <div class="shot ph-wrap"><span class="tag">K-03</span>
-      <div class="ph">
-        <div class="phTop"><span class="av"></span><b>[BORÇLU ADI]</b><i>çevrimiçi</i></div>
-        <div class="phBody">
+          </div>
+          <span class="phTag">GERÇEK EKRAN GÖRÜNTÜSÜ</span>
+        </div><span class="tag">K-02</span></div>
+      <figcaption>K-02</figcaption>
+    </figure>
+    <figure class="cell" data-i="2" data-cap="WhatsApp yazışması · 03" style="--d:320ms">
+      <div class="frame ph-frame">
+        <div class="ph">
+          <div class="phTop"><span class="av"></span><b>[BORÇLU ADI]</b><i>çevrimiçi</i></div>
+          <div class="phBody">
             <div class="bb in">Ödeme için tarih verebilir misiniz?</div>
             <div class="bb out">Ayın 15'i kesin.<span class="tick">✓✓</span></div>
             <div class="bb in">Ayın 15'i geçti.</div>
             <div class="bb out">Bu sefer aksattım, kusura bakmayın.<span class="tick">✓✓</span></div>
             <div class="bb in">Havale yaptım diyorsunuz, dekont yok.</div>
-        </div>
-        <span class="phTag">GERÇEK EKRAN GÖRÜNTÜSÜ BURAYA GELECEK</span>
-      </div></div>
-    <figcaption>WhatsApp yazışması · 03</figcaption>
-  </figure>
-  <figure class="slide" data-kind="wa">
-    <div class="shot ph-wrap"><span class="tag">K-04</span>
-      <div class="ph">
-        <div class="phTop"><span class="av"></span><b>[BORÇLU ADI]</b><i>çevrimiçi</i></div>
-        <div class="phBody">
+          </div>
+          <span class="phTag">GERÇEK EKRAN GÖRÜNTÜSÜ</span>
+        </div><span class="tag">K-03</span></div>
+      <figcaption>K-03</figcaption>
+    </figure>
+    <figure class="cell" data-i="3" data-cap="WhatsApp yazışması · 04" style="--d:410ms">
+      <div class="frame ph-frame">
+        <div class="ph">
+          <div class="phTop"><span class="av"></span><b>[BORÇLU ADI]</b><i>çevrimiçi</i></div>
+          <div class="phBody">
             <div class="bb in">Tekrar hatırlatıyorum, alacak duruyor.</div>
             <div class="bb out">Ok, ilgileniyorum.<span class="tick">✓✓</span></div>
             <div class="bb in">Cevap vermediniz, süre geçiyor.</div>
             <div class="bb out">Şu an müsait değilim.<span class="tick">✓✓</span></div>
             <div class="bb in">Görüldü olarak kalıyor, ödeme yok.</div>
+          </div>
+          <span class="phTag">GERÇEK EKRAN GÖRÜNTÜSÜ</span>
+        </div><span class="tag">K-04</span></div>
+      <figcaption>K-04</figcaption>
+    </figure>
         </div>
-        <span class="phTag">GERÇEK EKRAN GÖRÜNTÜSÜ BURAYA GELECEK</span>
-      </div></div>
-    <figcaption>WhatsApp yazışması · 04</figcaption>
-  </figure>
-  <figure class="slide" data-kind="kisi">
-    <div class="shot portrait ph-face"><div class="face"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="34" r="19" fill="#141414"/><path d="M12 100c0-21 17-34 38-34s38 13 38 34z" fill="#141414"/></svg></div><span class="phTag">FOTOĞRAF — BURAYA GELECEK</span><span class="tag">KARŞI TARAF</span></div>
-    <figcaption>Karşı taraf · [BORÇLU ADI]</figcaption>
-  </figure>
-        </div>
+
+        <figure class="portrait" id="portrait" data-cap="Karşı taraf · [BORÇLU ADI]">
+<div class="face"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="34" r="19" fill="#141414"/><path d="M12 100c0-21 17-34 38-34s38 13 38 34z" fill="#141414"/></svg></div><span class="phTag">FOTOĞRAF — BURAYA GELECEK</span><span class="tag">KARŞI TARAF</span>
+        </figure>
+
+        <div class="capBar"><em>▍</em><span id="capText">WhatsApp yazışması · 01</span></div>
       </div>
 
       <div class="prog run" id="prog"><i></i></div>
@@ -370,24 +398,47 @@ h1 .ln:nth-child(3){color:var(--r)}
   fit();
 
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var track  = document.getElementById("track");
-  var slides = Array.prototype.slice.call(track.querySelectorAll(".slide"));
-  var thumbs = Array.prototype.slice.call(document.querySelectorAll(".th"));
-  var prog   = document.getElementById("prog");
-  var cur    = document.querySelector(".cur");
-  var holder = document.getElementById("slider");
-  var side   = holder.querySelector(".side i");
+  var strip   = document.getElementById("strip");
+  var portrait= document.getElementById("portrait");
+  var cells   = Array.prototype.slice.call(strip.querySelectorAll(".cell"));
+  var thumbs  = Array.prototype.slice.call(document.querySelectorAll(".th"));
+  var prog    = document.getElementById("prog");
+  var cur     = document.querySelector(".cur");
+  var holder  = document.getElementById("slider");
+  var side    = holder.querySelector(".side i");
+  var capText = document.getElementById("capText");
+  var caps    = cells.map(function(c){ return c.dataset.cap; }).concat([portrait.dataset.cap]);
+  var TOTAL   = cells.length + 1;      /* ekran görüntüleri + fotoğraf */
   var DUR = 4600, i = 0, timer = null;
+
+  /* giriş animasyonu */
+  cells.forEach(function(c){ c.classList.add("in"); });
 
   function pad(n){ return (n < 9 ? "0" : "") + (n + 1); }
 
+  /* şeridi, aktif hücre ortada kalacak şekilde kaydır (sığmıyorsa) */
+  function center(k){
+    var parent = strip.clientWidth, cell = cells[k];
+    if (!cell){ strip.style.transform = "translateX(0)"; return; }
+    var last = cells[cells.length - 1];
+    var needed = last.offsetLeft + last.offsetWidth + 14;   /* sağ iç boşluk */
+    if (needed <= parent){ strip.style.transform = "translateX(0)"; return; }
+    var target = parent / 2 - (cell.offsetLeft + cell.offsetWidth / 2);
+    var min = parent - needed;
+    strip.style.transform = "translateX(" + Math.max(min, Math.min(0, Math.round(target))) + "px)";
+  }
+
   function go(n){
-    i = (n + slides.length) % slides.length;
-    track.style.transform = "translateX(" + (-i * 100) + "%)";
-    slides.forEach(function(s, k){ s.classList.toggle("on", k === i); });
+    i = (n + TOTAL) % TOTAL;
+    var inStrip = i < cells.length;
+    strip.classList.toggle("hide", !inStrip);
+    portrait.classList.toggle("on", !inStrip);
+    cells.forEach(function(c, k){ c.classList.toggle("on", k === i); });
     thumbs.forEach(function(t, k){ t.classList.toggle("on", k === i); });
-    if (cur) cur.textContent = pad(i);
+    if (inStrip) center(i); else strip.style.transform = "translateX(0)";
+    if (cur)  cur.textContent  = pad(i);
     if (side) side.textContent = pad(i);
+    if (capText) capText.textContent = caps[i] || "";
     prog.classList.remove("run");
     void prog.offsetWidth;          /* animasyonu baştan başlat */
     if (!reduced) prog.classList.add("run");
@@ -412,8 +463,10 @@ h1 .ln:nth-child(3){color:var(--r)}
   /* küçük resimler, slayttaki görselin aynısını gösterir (görseli iki kez
      gömüp dosyayı şişirmemek için kaynağı buradan kopyalar) */
   document.querySelectorAll(".th img[data-copy]").forEach(function(t){
-    var owner = document.querySelectorAll(".slide")[parseInt(t.dataset.copy, 10)];
-    var img = owner && owner.querySelector("img");
+    var key = t.dataset.copy;
+    var img = key === "p" ? portrait.querySelector("img")
+                          : (cells[parseInt(key, 10)] || {}).querySelector
+                            ? cells[parseInt(key, 10)].querySelector("img") : null;
     if (img && img.src) t.src = img.src;
   });
 
